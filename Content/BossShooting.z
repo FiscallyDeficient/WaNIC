@@ -1,0 +1,53 @@
+class BossShooting : ZilchComponent
+{
+    //create a property to define the bullets being fired
+    [Property]
+    var Projectile : Archetype = Archetype.Find("EnemyTears");
+    
+    [Property]
+    var Firespeed : Real = 100.0;
+    
+    //add properties to induce a timespawn mechanic
+    [Property]
+    var ShootDelay : Real = 1.0;
+    
+    [Property]
+    var ShootCoolDown : Real = 1.0;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.ShootCoolDown <= 0)
+        {
+        
+            var targetObject = this.Space.FindObjectByName("Zero");
+            
+            //find the position
+            var playerPos = targetObject.Transform.Translation;
+            
+            //define the object's position
+            var spawnPos = this.Owner.Transform.Translation;
+            
+            //Use linear algebra to determing the shooting
+            var targetDirection = playerPos - spawnPos;
+            //Normalize the speed of the bullets
+            targetDirection = Math.Normalize(targetDirection);
+            
+            var fireVelocity = targetDirection * this.Firespeed;
+            
+            var createdTear = this.Space.CreateAtPosition(this.Projectile, spawnPos);
+            
+            //give the tear/bullet the velocity in the direction needed
+            createdTear.RigidBody.Velocity = fireVelocity;
+            
+            this.ShootCoolDown = this.ShootDelay;
+        }
+        
+        this.ShootCoolDown -= event.Dt;
+        
+    }
+}

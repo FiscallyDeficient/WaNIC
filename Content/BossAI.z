@@ -1,0 +1,67 @@
+class BossAI : ZilchComponent
+{
+    [Property]
+    var PaceSpeed : Real = 5.0;
+    
+    [Property]
+    var MaxMoveDistance : Real = 10.0;
+    
+    var PaceDirection : Real3 = Real3(1.0, 0.0, 0.0);
+    
+    var StartPosition : Real3 = Real3(0.0, 5.0, 0.0);
+    
+    [Property]
+    var Level : Level = null;
+    
+    [Property]
+    var FirstShield : CogPath = null;
+    
+    [Property]
+    var SecondShield : CogPath = null;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.Owner.Health.Health == 0)
+        {
+            Console.WriteLine("Boss Defeated!");
+            this.Space.LoadLevel(this.Level);
+        }
+            
+        if(this.CheckShields() == true)
+        {
+            var displacement = this.Owner.Transform.Translation - this.StartPosition;
+            //^ this gives us a Real3, but to know how far we've actually travelled,
+            var distanceFromStart = Math.Length(displacement);
+            //if we have travelled past our max distance
+            if(distanceFromStart >= this.MaxMoveDistance)
+            {
+                //Change direction to go back the way whence we came
+                this.PaceDirection = -displacement;
+                Console.WriteLine("Boss Turnaround");
+            }
+            
+            //this insures that the pace direction is only a direction via normalizaiton
+            this.PaceDirection = Math.Normalize(this.PaceDirection);
+            //apply movement to our AI
+            this.Owner.Transform.Translation += this.PaceDirection * event.Dt * this.PaceSpeed;
+        }
+        
+    }
+    
+    function CheckShields() : Boolean
+    {
+        if (this.FirstShield.Cog != null || this.SecondShield.Cog != null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+}

@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "Camera_Pan_Directional",
+		uint64 ResourceId = 550f3775b6c2c32c,
+	},
+},

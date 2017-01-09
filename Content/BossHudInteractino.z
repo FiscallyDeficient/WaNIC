@@ -1,0 +1,53 @@
+class BossHudInteractino : ZilchComponent
+{
+    // a way to store the sprite we atre controlling so we dont have to find it every time
+    var Heart : Cog;
+    var Heart1 : Cog;
+    var Heart2 : Cog;
+    var Heart3 : Cog;
+    var Heart4 : Cog;
+    var Heart5 : Cog;
+    
+    [Dependency]
+    var HudCreator : BossHudCreator;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        this.Heart = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart");
+        this.Heart1 = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart1");
+        this.Heart2 = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart2");
+        this.Heart3 = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart3");
+        this.Heart4 = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart4");
+        this.Heart5 = this.Owner.HudCreator.HudSpace.FindObjectByName("Heart5");
+    }
+    
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        //move an object from hudlevel
+        // -- simply show we can interact with it by making the hudsprite fall
+        
+        var zero = this.Space.FindObjectByName("Zero");
+        
+        if(zero.Health.Health == 5)
+        {
+            this.Heart5.Sprite.Color = Real4(0.0, 0.0, 0.0, 0.0);
+        }
+        if(zero.Health.Health == 4)
+        {
+            this.Heart4.Sprite.Color = Real4(0.0, 0.0, 0.0, 0.0);
+        }
+        if(zero.Health.Health == 3)
+        {
+            this.Heart3.Sprite.Color = Real4(0.0, 0.0, 0.0, 0.0);
+        }
+        if(zero.Health.Health == 2)
+        {
+            this.Heart2.Sprite.Color = Real4(0.0, 0.0, 0.0, 0.0);
+        }
+        if(zero.Health.Health == 1)
+        {
+            this.Heart1.Sprite.Color = Real4(0.0, 0.0, 0.0, 0.0);
+        }
+    }
+}

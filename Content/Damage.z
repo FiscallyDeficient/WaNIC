@@ -1,0 +1,85 @@
+class Damage : ZilchComponent
+{
+    [Property]
+    var Damage_On_Hit : Integer = 0;
+    
+    function Initialize(init : CogInitializer)
+    {
+        //a function for recognizing collisions
+        //Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.Owner, Events.CollisionStarted, this.OnCollisionStarted);
+    }
+
+    function OnCollisionStarted(event : CollisionEvent)
+    {
+        //Console.WriteLine(event.OtherObject.Name);
+        //if the collision entails an enemy, the enemy will lose one health as will the bullets
+        if(event.OtherObject.Name.Contains("Enemy") || event.OtherObject.Name == "BossWaves")
+        {
+            event.OtherObject.Health.Health -= this.Damage_On_Hit;
+        }
+        //if the player gets hit by his own tears he will not take damage
+        if(event.OtherObject.Name == "Zero" || event.OtherObject.Name == "Shield")
+        {
+            //Console.WriteLine("Player");
+            return;
+        }
+        
+        if(event.OtherObject.Name.Contains("Teleporter"))
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "2" || event.OtherObject.Name == "3" || event.OtherObject.Name == "5")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "6" || event.OtherObject.Name == "7" || event.OtherObject.Name == "8")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "9" || event.OtherObject.Name == "10" || event.OtherObject.Name == "11")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "12" || event.OtherObject.Name == "13" || event.OtherObject.Name == "14")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "15" || event.OtherObject.Name == "16" || event.OtherObject.Name == "17")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "18" || event.OtherObject.Name == "20" || event.OtherObject.Name == "21")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "22" || event.OtherObject.Name == "23" || event.OtherObject.Name == "24")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "26" || event.OtherObject.Name == "27" || event.OtherObject.Name == "28")
+        {
+            return;
+        }
+        
+        if(event.OtherObject.Name == "29" || event.OtherObject.Name == "31" || event.OtherObject.Name == "32" || 
+                                             event.OtherObject.Name == "33")
+        {
+            return;
+        }
+        //bullets destroyed upon any collsiions
+        this.Owner.Destroy();
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+    }
+}

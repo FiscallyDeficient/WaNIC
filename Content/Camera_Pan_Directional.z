@@ -1,0 +1,154 @@
+class Camera_Pan_Directional : ZilchComponent
+{
+    [Property]
+    var Camera_Follows_This : CogPath = null;  // the thing you want to keep within the cameras region
+    
+    [Property]
+    var Camera_Pan_XOffset : Real = Real();    // decreases the region at which it takes to make the camera move in the x direction
+    
+    [Property]
+    var Camera_Pan_YOffset : Real = Real(1);   // decreases the region at which it take to make the camera move in the y direction
+    
+    [Property]
+    var Camera_Pan_Speed : Integer = 1;        // the speed at which the camera pans to its next position
+    
+    [Property]
+    var Snap_Camera : Boolean = false;         // snaps the camera to the next Pan Position rather than the camera sliding
+    
+    [Property]
+    var Camera_Snapping_Delay : Real = 0.0;    // Prevents the camera from snapping too much if you are directly on the edge
+    
+    var Start_Snap_Timer : Boolean = false;    // delays the camera from moving again
+    var Timer : Real = 0.0;
+    var Next_Camera_Cog : Cog = null;
+    var Camera_Moving : Boolean = false;    
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.Start_Snap_Timer)
+        {
+            this.Timer += event.Dt;
+            if(this.Timer >= this.Camera_Snapping_Delay)
+            {
+                this.Timer = 0.0;
+                this.Start_Snap_Timer = false;
+            }
+        }        
+        
+        if(this.Camera_Moving)    // if the camera is moving we don't want to do anything until it finishes
+        {
+            if(this.Snap_Camera)  // if the Snap_Camera is checked we just want to snap the camera to the next possible position
+            {
+                if(this.Start_Snap_Timer == false)
+                {
+                        // this simply just snaps the camera to the nearest camera position
+                    this.Owner.Transform.Translation = Real3(this.Next_Camera_Cog.Transform.Translation.X, 
+                                                             this.Next_Camera_Cog.Transform.Translation.Y, 40);
+                                                                      
+                    this.Start_Snap_Timer = true;
+                    this.Camera_Moving = false;
+                    return;
+                }
+                else
+                {
+                    return;  // if the timer is going we don't want to snap the camera again
+                }
+            }
+            else
+            {
+                var next_cam_pos = this.Next_Camera_Cog.Transform.Translation;
+                var camera_pos = this.Owner.Transform.Translation;
+                
+                  // a vector from the camera to the next camers position
+                var vec_next_cam_to_camera_pos = next_cam_pos - camera_pos;
+                
+                  // makes sure we don't add any extra speed in the direction we are going
+                vec_next_cam_to_camera_pos = Math.Normalize(vec_next_cam_to_camera_pos);
+                
+                
+                var distance_to_next_pos = Math.Distance(Real3(camera_pos.X, camera_pos.Y, 0), next_cam_pos);
+                
+                this.Owner.Transform.Translation += vec_next_cam_to_camera_pos * event.Dt * this.Camera_Pan_Speed;
+                
+                if(distance_to_next_pos <= 1)
+                {
+                    this.Camera_Moving = false;
+                    this.Owner.Transform.Translation = Real3(next_cam_pos.X, next_cam_pos.Y, 40);
+                }                
+            }
+        }       
+        if(this.Check_Player_Within_Camera() == false)
+        {
+            this.Next_Camera_Cog = this.Find_Nearest_CameraPan_Position();
+        }
+    }
+    
+    function Check_Player_Within_Camera() : Boolean
+    {
+        if(this.Camera_Follows_This.Cog != null)
+        {
+            var player_pos = this.Camera_Follows_This.Cog.Transform.Translation;
+            var camera_pos = this.Owner.Transform.Translation;
+              
+            
+              
+              // checks if the player is within the camera region
+            if(player_pos.X < (camera_pos.X + this.Owner.Camera.Size - this.Camera_Pan_XOffset) && 
+               player_pos.X > (camera_pos.X - this.Owner.Camera.Size + this.Camera_Pan_XOffset) &&
+               player_pos.Y < (camera_pos.Y + this.Owner.Camera.Size / this.Camera_Pan_YOffset) &&
+               player_pos.Y > (camera_pos.Y - this.Owner.Camera.Size / this.Camera_Pan_YOffset))
+            {
+                return true;
+            }
+            else  // we are outside of the camera, pan the camera either left or right
+            {
+                Console.WriteLine("not within the cameras view");
+                this.Camera_Moving = true;
+                return false;
+            }
+        }
+        else  // Debugging Information, Something wasn't set properly
+        {
+            if(this.Camera_Follows_This.Cog == null)
+            {
+                Console.WriteLine("CAMERA IS NOT FOLLOWING ANYTHING, CAMERA_FOLLOWS_THIS IS NULL");
+                Console.WriteLine("IN  THE SCRIPT 'CAMERA_PAN_DIRECTIONAL' ");
+            }
+        }
+        return true;
+    }
+    
+    function Find_Nearest_CameraPan_Position() : Cog
+    {
+        var nearest_pan : Cog = null;
+        var camera_follows_this_pos = this.Camera_Follows_This.Cog.Transform.Translation;
+        var smallest_distance = 0.0;
+        
+        
+        foreach(var allobjs in this.Space.AllObjects())
+        {
+            
+            if(allobjs.Camera_Pan_Position != null)
+            {
+                var distance = Math.Distance(camera_follows_this_pos, allobjs.Transform.Translation);
+                
+                if(smallest_distance == 0.0)
+                {
+                    smallest_distance = distance;
+                    nearest_pan = allobjs;
+                }
+                else if(distance < smallest_distance)
+                {
+                    smallest_distance = distance;
+                    nearest_pan = allobjs;
+                }
+            }
+        }
+        return nearest_pan;
+    }
+}

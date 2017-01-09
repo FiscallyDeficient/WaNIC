@@ -1,0 +1,25 @@
+class BossHudCreator : ZilchComponent
+{
+    [Property]
+    var HudLevel : Level = null;
+    // variable that has the hud in it
+    
+    var HudSpace : Space = null;
+    
+    function Initialize(init : CogInitializer)
+    {
+        // create a new space to load our hud level into
+        this.HudSpace = this.GameSession.CreateNamedSpace("HudSpace2", Archetype.Find("Space"));
+        // load the hud level set in the property
+        this.HudSpace.LoadLevel(this.HudLevel);
+    }
+    
+    function Destroyed()
+    {
+        //make sure to clean up the extra space we created
+        if(this.HudSpace != null)
+        {
+            this.HudSpace.Destroy();
+        }
+    }
+}

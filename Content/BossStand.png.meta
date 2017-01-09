@@ -1,0 +1,20 @@
+ImageContent = 
+{
+	SpriteSourceBuilder = 
+	{
+		string Name = "BossStand",
+		uint64 ResourceId = 550df231fa1f4a97,
+		uint64 AtlasId = 5274cf95e4a661fd,
+		uint FrameSizeX = 288,
+		uint FrameSizeY = 360,
+		uint FrameCount = 2,
+		float FrameDelay = 0.5,
+		float OriginX = 144,
+		float OriginY = 180,
+		float PixelsPerUnit = 64,
+		bool Smoothing = false,
+		bool Looping = true,
+		Vec4 Slices = [0, 0, 0, 0],
+		SpriteFill Fill = Stretch,
+	},
+},

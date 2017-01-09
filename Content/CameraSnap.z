@@ -1,0 +1,50 @@
+class CameraSnap : ZilchComponent
+{
+    function Initialize(init : CogInitializer)
+    {
+        //Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.Owner, Events.CollisionStarted, this.OnCollisionStarted);
+    }
+
+    function OnCollisionStarted(event : CollisionEvent)
+    {
+        var camera = this.Space.FindObjectByName("Camera");
+        
+        var position = camera.Transform.Translation;
+        
+        if(event.OtherObject.Name == "Teleporter")
+        {
+            Console.WriteLine(event.OtherObject.Name);
+            
+            position.X = -31.381;
+            
+            position.Y = -52.6556;
+            
+            position.Z = 40;
+        }
+        
+        if(event.OtherObject.Name == "Teleporter2")
+        {
+            Console.WriteLine(event.OtherObject.Name);
+            
+            position.X = 74.1926;
+            
+            position.Y = -52.6556;
+            
+            position.Z = 40;
+        }
+        
+        if(event.OtherObject.Name == "Teleporter3")
+        {
+            position.X = 0.0;
+            
+            position.Y = 0.0;
+            
+            position.Z = 40;
+        }
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+    }
+}
